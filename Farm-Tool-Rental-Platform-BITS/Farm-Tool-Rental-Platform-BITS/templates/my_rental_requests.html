@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}My Rental Requests{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">My Rental Requests</h2>
+
+    <!-- Sent Requests -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Sent Requests</h5>
+        </div>
+        <div class="card-body">
+            {% if sent_requests %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Owner</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in sent_requests %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_tool', tool_id=request.tool.id) }}" class="text-decoration-none">
+                                    {{ request.tool.name }}
+                                </a>
+                            </td>
+                            <td>{{ request.tool.owner_user.username }}</td>
+                            <td>{{ request.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ request.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ request.message or 'No message' }}</td>
+                            <td>
+                                <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ request.status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('view_tool', tool_id=request.tool.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if request.status == 'pending' %}
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="cancelRequest('{{ request.id }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-paper-plane fa-3x text-muted mb-3"></i>
+                <h4>No sent requests</h4>
+                <p class="text-muted">Browse available tools to make rental requests!</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Browse Tools
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Received Requests -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Received Requests</h5>
+        </div>
+        <div class="card-body">
+            {% if received_requests %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Requester</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in received_requests %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_tool', tool_id=request.tool.id) }}" class="text-decoration-none">
+                                    {{ request.tool.name }}
+                                </a>
+                            </td>
+                            <td>{{ request.renter.username }}</td>
+                            <td>{{ request.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ request.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ request.message or 'No message' }}</td>
+                            <td>
+                                <span class="badge {% if request.status == 'pending' %}bg-warning{% elif request.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ request.status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('view_tool', tool_id=request.tool.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if request.status == 'pending' %}
+                                    <button class="btn btn-sm btn-outline-success" 
+                                            onclick="handleRequest('{{ request.id }}', 'approved')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="handleRequest('{{ request.id }}', 'rejected')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h4>No received requests</h4>
+                <p class="text-muted">You haven't received any rental requests yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function handleRequest(requestId, action) {
+    if (confirm(`Are you sure you want to ${action} this request?`)) {
+        const backendAction = action === 'approved' ? 'approve' : 'reject';
+        
+        fetch(`/rental-requests/${requestId}/handle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: backendAction })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                location.reload();
+            } else {
+                alert('Error processing request');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error processing request');
+        });
+    }
+}
+
+function cancelRequest(requestId) {
+    if (confirm('Are you sure you want to cancel this request?')) {
+        fetch(`/rental-requests/${requestId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                location.reload();
+            } else {
+                alert('Error canceling request');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error canceling request');
+        });
+    }
+}
+</script>
+{% endblock %}

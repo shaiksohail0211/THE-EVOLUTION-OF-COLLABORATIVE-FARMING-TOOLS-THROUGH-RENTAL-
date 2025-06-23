@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f44336;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Update on Your Rental Request</h2>
+        </div>
+        <div class="content">
+            <p>Hello,</p>
+            <p>Unfortunately, your rental request for the following bike has been declined:</p>
+            
+            <h3>Request Details:</h3>
+            <ul>
+                <li><strong>Bike:</strong> {{ bike.name }} ({{ bike.model }})</li>
+                <li><strong>Requested Dates:</strong> {{ request.start_date.strftime('%Y-%m-%d') }} to {{ request.end_date.strftime('%Y-%m-%d') }}</li>
+            </ul>
+
+            <p>Don't worry! There are many other great bikes available for rent. Click the button below to browse more options:</p>
+            
+            <a href="{{ url_for('index', _external=True) }}" class="button">
+                Browse More Bikes
+            </a>
+
+            <p style="margin-top: 20px;">
+                <small>This is an automated message. Please do not reply to this email.</small>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

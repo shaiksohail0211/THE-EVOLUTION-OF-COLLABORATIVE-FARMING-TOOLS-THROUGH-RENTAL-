@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Tool Categories{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Farm Tool Categories</h2>
+    <p class="lead mb-4">Select a tool category to view available tools for voice booking</p>
+    
+    <div class="row g-4">
+        <!-- Tractor -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/download.jpeg') }}" class="card-img-top" alt="Tractor" onerror="this.src='{{ url_for('static', filename='images/download.jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Tractors</h4>
+                    <p class="card-text">Powerful vehicles used for pulling or powering farm implements</p>
+                    <a href="{{ url_for('voice_book', category='Tractor') }}" class="btn btn-primary">View Tractors</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Harvester -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/download (1).jpeg') }}" class="card-img-top" alt="Harvester" onerror="this.src='{{ url_for('static', filename='images/download (1).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Harvesters</h4>
+                    <p class="card-text">Machines used to harvest crops efficiently</p>
+                    <a href="{{ url_for('voice_book', category='Harvester') }}" class="btn btn-primary">View Harvesters</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Plow -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/download (2).jpeg') }}" class="card-img-top" alt="Plow" onerror="this.src='{{ url_for('static', filename='images/download (2).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Plows</h4>
+                    <p class="card-text">Tools used to break and turn over soil in preparation for planting</p>
+                    <a href="{{ url_for('voice_book', category='Plow') }}" class="btn btn-primary">View Plows</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Seeder -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/images.jpeg') }}" class="card-img-top" alt="Seeder" onerror="this.src='{{ url_for('static', filename='images/images.jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Seeders</h4>
+                    <p class="card-text">Equipment used for planting seeds at proper depths and spacing</p>
+                    <a href="{{ url_for('voice_book', category='Seeder') }}" class="btn btn-primary">View Seeders</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sprayer -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/images (1).jpeg') }}" class="card-img-top" alt="Sprayer" onerror="this.src='{{ url_for('static', filename='images/images (1).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Sprayers</h4>
+                    <p class="card-text">Equipment used for applying fertilizers, pesticides, and herbicides</p>
+                    <a href="{{ url_for('voice_book', category='Sprayer') }}" class="btn btn-primary">View Sprayers</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Irrigation Equipment -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/images (2).jpeg') }}" class="card-img-top" alt="Irrigation Equipment" onerror="this.src='{{ url_for('static', filename='images/images (2).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Irrigation Equipment</h4>
+                    <p class="card-text">Systems and tools for watering crops efficiently</p>
+                    <a href="{{ url_for('voice_book', category='Irrigation') }}" class="btn btn-primary">View Irrigation Equipment</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cultivator -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/images (3).jpeg') }}" class="card-img-top" alt="Cultivator" onerror="this.src='{{ url_for('static', filename='images/images (3).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Cultivators</h4>
+                    <p class="card-text">Tools used to loosen soil and remove weeds</p>
+                    <a href="{{ url_for('voice_book', category='Cultivator') }}" class="btn btn-primary">View Cultivators</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mower -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/images (4).jpeg') }}" class="card-img-top" alt="Mower" onerror="this.src='{{ url_for('static', filename='images/images (4).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Mowers</h4>
+                    <p class="card-text">Equipment used for cutting grass and crops</p>
+                    <a href="{{ url_for('voice_book', category='Mower') }}" class="btn btn-primary">View Mowers</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Other -->
+        <div class="col-md-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/images (5).jpeg') }}" class="card-img-top" alt="Other Tools" onerror="this.src='{{ url_for('static', filename='images/images (5).jpeg') }}'">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Other Tools</h4>
+                    <p class="card-text">Various other farming tools and equipment</p>
+                    <a href="{{ url_for('voice_book', category='Other') }}" class="btn btn-primary">View Other Tools</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- View All Tools -->
+        <div class="col-12 text-center mt-4">
+            <a href="{{ url_for('voice_book') }}" class="btn btn-success btn-lg">View All Tools</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .category-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

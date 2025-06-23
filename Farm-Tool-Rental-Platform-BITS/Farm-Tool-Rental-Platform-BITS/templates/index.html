@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="hero-title">Rent Agricultural Tools & Equipment</h1>
+                <p class="hero-subtitle">Connect with local farmers and make farming more efficient with our comprehensive tool rental platform.</p>
+                {% if session.get('user_id') %}
+                <a href="{{ url_for('add_tool') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>List Your Tool
+                </a>
+                {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                {% endif %}
+            </div>
+            <!-- <div class="col-lg-6">
+                <img src="{{ url_for('static', filename='images/farm-hero.jpg') }}" alt="Farm Equipment" class="img-fluid rounded shadow">
+            </div> -->
+        </div>
+    </div>
+</section>
+
+<!-- <section class="search-section">
+    <div class="container">
+        <form action="{{ url_for('index') }}" method="GET" class="row g-3">
+            <div class="col-md-4">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    <option value="Tractor" {% if request.args.get('category') == 'Tractor' %}selected{% endif %}>Tractors</option>
+                    <option value="Harvester" {% if request.args.get('category') == 'Harvester' %}selected{% endif %}>Harvesters</option>
+                    <option value="Plow" {% if request.args.get('category') == 'Plow' %}selected{% endif %}>Plows</option>
+                    <option value="Seeder" {% if request.args.get('category') == 'Seeder' %}selected{% endif %}>Seeders</option>
+                    <option value="Irrigation" {% if request.args.get('category') == 'Irrigation' %}selected{% endif %}>Irrigation Equipment</option>
+                    <option value="Sprayer" {% if request.args.get('category') == 'Sprayer' %}selected{% endif %}>Sprayers</option>
+                    <option value="Cultivator" {% if request.args.get('category') == 'Cultivator' %}selected{% endif %}>Cultivators</option>
+                    <option value="Mower" {% if request.args.get('category') == 'Mower' %}selected{% endif %}>Mowers</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="Search tools..." value="{{ request.args.get('search', '') }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+</section> -->
+
+<section class="featured-tools py-5">
+    <div class="container">
+        <h2 class="mb-4">Featured Farming Tools</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename='images/images (1).jpeg') }}" class="card-img-top" alt="Tractor">
+                    <span class="tool-category-badge">Tractor</span>
+                    <div class="card-body">
+                        <h5 class="card-title">Modern Tractor</h5>
+                        <p class="card-text text-muted">High-performance farming equipment</p>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <span class="text-primary">₹500/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename='images/images (2).jpeg') }}" class="card-img-top" alt="Harvester">
+                    <span class="tool-category-badge">Harvester</span>
+                    <div class="card-body">
+                        <h5 class="card-title">Combine Harvester</h5>
+                        <p class="card-text text-muted">Efficient crop harvesting machine</p>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <span class="text-primary">₹800/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename='images/images (3).jpeg') }}" class="card-img-top" alt="Plow">
+                    <span class="tool-category-badge">Plow</span>
+                    <div class="card-body">
+                        <h5 class="card-title">Modern Plow</h5>
+                        <p class="card-text text-muted">Advanced plowing equipment</p>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <span class="text-primary">₹300/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename='images/download.jpeg') }}" class="card-img-top" alt="Sprayer">
+                    <span class="tool-category-badge">Sprayer</span>
+                    <div class="card-body">
+                        <h5 class="card-title">Crop Sprayer</h5>
+                        <p class="card-text text-muted">Professional spraying equipment</p>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <span class="text-primary">₹250/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename='images/download (1).jpeg') }}" class="card-img-top" alt="Cultivator">
+                    <span class="tool-category-badge">Cultivator</span>
+                    <div class="card-body">
+                        <h5 class="card-title">Modern Cultivator</h5>
+                        <p class="card-text text-muted">Advanced cultivation equipment</p>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <span class="text-primary">₹120/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename='images/images.jpeg') }}" class="card-img-top" alt="Farm Equipment">
+                    <span class="tool-category-badge">Farm Equipment</span>
+                    <div class="card-body">
+                        <h5 class="card-title">Farm Equipment Set</h5>
+                        <p class="card-text text-muted">Complete farming equipment package</p>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <span class="text-primary">₹1000/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="available-tools py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4">Available Tools</h2>
+        <div class="row g-4">
+            {% for tool in tools %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    {% if tool.image_url_1 %}
+                    <img src="{{ url_for('static', filename=tool.image_url_1.replace('\\', '/')) }}" class="card-img-top" alt="{{ tool.name }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/tool-placeholder.jpg') }}" class="card-img-top" alt="Tool placeholder">
+                    {% endif %}
+                    <span class="tool-category-badge">{{ tool.category }}</span>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ tool.name }}</h5>
+                        <p class="card-text text-muted">{{ tool.brand }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if tool.listing_type == 'rent' %}
+                                <span class="text-primary">Rs{{ "%.2f"|format(tool.price_per_day) }}/day</span>
+                                {% else %}
+                                <span class="text-success">Rs{{ "%.2f"|format(tool.sale_price) }}</span>
+                                {% endif %}
+                            </div>
+                            <a href="{{ url_for('view_tool', tool_id=tool.id) }}" class="btn btn-outline-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+                <h3>No tools available</h3>
+                <p class="text-muted">Be the first to list your agricultural tools!</p>
+                {% if session.get('user_id') %}
+                <a href="{{ url_for('add_tool') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>List Your Tool
+                </a>
+                {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="categories py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4">Popular Categories</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tractor fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Tractors</h5>
+                        <p class="card-text text-muted">Find powerful tractors for your farming needs</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-wheat-awn fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Harvesters</h5>
+                        <p class="card-text text-muted">Efficient harvesting equipment for your crops</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-spray-can fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Sprayers</h5>
+                        <p class="card-text text-muted">Professional spraying equipment</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-seedling fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Seeders</h5>
+                        <p class="card-text text-muted">Precision seeding equipment</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-water fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Irrigation</h5>
+                        <p class="card-text text-muted">Modern irrigation systems</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-trowel fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Plows</h5>
+                        <p class="card-text text-muted">Quality plowing equipment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h4>Secure Transactions</h4>
+                    <p class="text-muted">Safe and reliable rental process with verified users</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+                    <h4>Local Community</h4>
+                    <p class="text-muted">Connect with farmers in your area</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h4>Flexible Rental</h4>
+                    <p class="text-muted">Rent tools for any duration you need</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ tool.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Edit Tool Details</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="editToolForm">
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5>Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Tool Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ tool.name }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="category" class="form-label">Category</label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Tractor" {% if tool.category == 'Tractor' %}selected{% endif %}>Tractor</option>
+                                        <option value="Harvester" {% if tool.category == 'Harvester' %}selected{% endif %}>Harvester</option>
+                                        <option value="Plow" {% if tool.category == 'Plow' %}selected{% endif %}>Plow</option>
+                                        <option value="Seeder" {% if tool.category == 'Seeder' %}selected{% endif %}>Seeder</option>
+                                        <option value="Irrigation" {% if tool.category == 'Irrigation' %}selected{% endif %}>Irrigation Equipment</option>
+                                        <option value="Sprayer" {% if tool.category == 'Sprayer' %}selected{% endif %}>Sprayer</option>
+                                        <option value="Cultivator" {% if tool.category == 'Cultivator' %}selected{% endif %}>Cultivator</option>
+                                        <option value="Mower" {% if tool.category == 'Mower' %}selected{% endif %}>Mower</option>
+                                        <option value="Other" {% if tool.category == 'Other' %}selected{% endif %}>Other</option>
+                                    </select>
+                        </div>
+                        </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="brand" class="form-label">Brand</label>
+                                    <input type="text" class="form-control" id="brand" name="brand" 
+                                           value="{{ tool.brand }}" required>
+                        </div>
+                                <div class="col-md-6 mb-3">
+                            <label for="condition" class="form-label">Condition</label>
+                            <select class="form-select" id="condition" name="condition" required>
+                                        <option value="">Select Condition</option>
+                                        <option value="Excellent" {% if tool.condition == 'Excellent' %}selected{% endif %}>Excellent</option>
+                                        <option value="Good" {% if tool.condition == 'Good' %}selected{% endif %}>Good</option>
+                                        <option value="Fair" {% if tool.condition == 'Fair' %}selected{% endif %}>Fair</option>
+                                        <option value="Poor" {% if tool.condition == 'Poor' %}selected{% endif %}>Poor</option>
+                            </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing and Availability -->
+                        <div class="mb-4">
+                            <h5>Pricing and Availability</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                            <label for="listing_type" class="form-label">Listing Type</label>
+                            <select class="form-select" id="listing_type" name="listing_type" required>
+                                        <option value="rent" {% if tool.listing_type == 'rent' %}selected{% endif %}>For Rent</option>
+                                        <option value="sale" {% if tool.listing_type == 'sale' %}selected{% endif %}>For Sale</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="is_available" class="form-label">Availability</label>
+                                    <select class="form-select" id="is_available" name="is_available" required>
+                                        <option value="1" {% if tool.is_available %}selected{% endif %}>Available</option>
+                                        <option value="0" {% if not tool.is_available %}selected{% endif %}>Not Available</option>
+                            </select>
+                        </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                            <label for="price_per_day" class="form-label">Price per Day (Rs)</label>
+                                    <input type="number" class="form-control" id="price_per_day" name="price_per_day" 
+                                           value="{{ tool.price_per_day }}" step="0.01" min="0">
+                                    <div class="form-text">Required for rental listings</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="sale_price" class="form-label">Sale Price (Rs)</label>
+                                    <input type="number" class="form-control" id="sale_price" name="sale_price" 
+                                           value="{{ tool.sale_price }}" step="0.01" min="0">
+                                    <div class="form-text">Required for sale listings</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Details -->
+                        <div class="mb-4">
+                            <h5>Technical Details</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="power_source" class="form-label">Power Source</label>
+                                    <select class="form-select" id="power_source" name="power_source">
+                                        <option value="">Select Power Source</option>
+                                        <option value="Diesel" {% if tool.power_source == 'Diesel' %}selected{% endif %}>Diesel</option>
+                                        <option value="Electric" {% if tool.power_source == 'Electric' %}selected{% endif %}>Electric</option>
+                                        <option value="Manual" {% if tool.power_source == 'Manual' %}selected{% endif %}>Manual</option>
+                                        <option value="Other" {% if tool.power_source == 'Other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="maintenance_status" class="form-label">Maintenance Status</label>
+                                    <select class="form-select" id="maintenance_status" name="maintenance_status">
+                                        <option value="">Select Status</option>
+                                        <option value="Excellent" {% if tool.maintenance_status == 'Excellent' %}selected{% endif %}>Excellent</option>
+                                        <option value="Good" {% if tool.maintenance_status == 'Good' %}selected{% endif %}>Good</option>
+                                        <option value="Fair" {% if tool.maintenance_status == 'Fair' %}selected{% endif %}>Fair</option>
+                                        <option value="Needs Maintenance" {% if tool.maintenance_status == 'Needs Maintenance' %}selected{% endif %}>Needs Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="last_maintenance_date" class="form-label">Last Maintenance Date</label>
+                                <input type="date" class="form-control" id="last_maintenance_date" name="last_maintenance_date" 
+                                       value="{{ tool.last_maintenance_date.strftime('%Y-%m-%d') if tool.last_maintenance_date }}">
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <h5>Description</h5>
+                        <div class="mb-3">
+                                <label for="description" class="form-label">Tool Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required>{{ tool.description }}</textarea>
+                                <div class="form-text">Provide detailed information about the tool's features and specifications</div>
+                            </div>
+                        </div>
+
+                        <!-- Images -->
+                        <div class="mb-4">
+                            <h5>Images</h5>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="image_1" class="form-label">Primary Image</label>
+                                    {% if tool.image_url_1 %}
+                                    <div class="mb-2">
+                                        <img src="{{ url_for('static', filename=tool.image_url_1.replace('\\', '/')) }}" class="img-thumbnail" style="max-height: 150px;">
+                                    </div>
+                                    {% endif %}
+                                    <input type="file" class="form-control" id="image_1" name="image_1" accept="image/*">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="image_2" class="form-label">Additional Image 1</label>
+                                    {% if tool.image_url_2 %}
+                                    <div class="mb-2">
+                                        <img src="{{ url_for('static', filename=tool.image_url_2.replace('\\', '/')) }}" class="img-thumbnail" style="max-height: 150px;">
+                                    </div>
+                                    {% endif %}
+                                    <input type="file" class="form-control" id="image_2" name="image_2" accept="image/*">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="image_3" class="form-label">Additional Image 2</label>
+                                    {% if tool.image_url_3 %}
+                                    <div class="mb-2">
+                                        <img src="{{ url_for('static', filename=tool.image_url_3.replace('\\', '/')) }}" class="img-thumbnail" style="max-height: 150px;">
+                                    </div>
+                                    {% endif %}
+                                    <input type="file" class="form-control" id="image_3" name="image_3" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{{ url_for('view_tool', tool_id=tool.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editToolForm');
+    const listingType = document.getElementById('listing_type');
+    const pricePerDay = document.getElementById('price_per_day');
+    const salePrice = document.getElementById('sale_price');
+
+    // Validate form before submission
+    form.addEventListener('submit', function(e) {
+        if (listingType.value === 'rent' && !pricePerDay.value) {
+            e.preventDefault();
+            alert('Please enter a price per day for rental listings');
+        } else if (listingType.value === 'sale' && !salePrice.value) {
+            e.preventDefault();
+            alert('Please enter a sale price for sale listings');
+        }
+    });
+
+    // Show/hide relevant price fields based on listing type
+    listingType.addEventListener('change', function() {
+        if (this.value === 'rent') {
+            pricePerDay.required = true;
+            salePrice.required = false;
+        } else {
+            pricePerDay.required = false;
+            salePrice.required = true;
+        }
+    });
+});
+</script>
+{% endblock %}

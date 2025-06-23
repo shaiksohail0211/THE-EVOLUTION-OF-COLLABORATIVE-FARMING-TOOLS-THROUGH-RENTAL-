@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" class="min-vh-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Farm Tools Rental Platform</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #4caf50;
+            --success-color: #2e7d32;
+            --danger-color: #d32f2f;
+            --warning-color: #f57c00;
+            --info-color: #1976d2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            background-image: url('/static/images/farm-background.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        main {
+            flex: 1 0 auto;
+            padding: 2rem 0;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .footer {
+            flex-shrink: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-link {
+            color: var(--gray-600) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+            border-radius: 0.5rem;
+            margin: 0 0.25rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            background-color: var(--gray-50);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            background-color: var(--gray-100);
+        }
+
+        .btn {
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-top {
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .tool-category-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(46, 125, 50, 0.8), rgba(27, 94, 32, 0.8));
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: -3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+        .social-link {
+            color: var(--gray-600);
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            transition: color 0.2s;
+        }
+
+        .social-link:hover {
+            color: var(--primary-color);
+        }
+
+        .badge {
+            padding: 0.5em 0.75em;
+            font-weight: 500;
+        }
+
+        .alert {
+            border-radius: 0.5rem;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    <!-- Google Translate Script -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'hi,bn,te,ta,ml,kn,gu,mr,pa,en', // Indian languages + English
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        /* Style for the translation widget */
+        #google_translate_element {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Hide Google Translate attribution */
+        .goog-logo-link {
+            display: none !important;
+        }
+        .goog-te-gadget {
+            color: transparent !important;
+        }
+        .goog-te-gadget .goog-te-combo {
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 0 !important;
+        }
+
+        /* Fix for translation causing horizontal scroll */
+        body {
+            top: 0 !important;
+        }
+        /* Hide Google Translate top bar */
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        /* Custom language selector button */
+        .language-selector-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #google_translate_element {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+            .goog-te-gadget .goog-te-combo {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-tractor me-2"></i>FarmTools
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    {% if session.get('user_id') %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'my_tools' %}active{% endif %}" href="{{ url_for('my_tools') }}">
+                            <i class="fas fa-tools me-1"></i>My Tools
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'my_rentals' %}active{% endif %}" href="{{ url_for('my_rentals') }}">
+                            <i class="fas fa-calendar-alt me-1"></i>My Rentals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'my_rental_requests' %}active{% endif %}" href="{{ url_for('my_rental_requests') }}">
+                            <i class="fas fa-inbox me-1"></i>Requests
+                            {% if get_pending_requests_count() > 0 %}
+                            <span class="badge bg-danger">{{ get_pending_requests_count() }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'tools_categories' or request.endpoint == 'voice_book' %}active{% endif %}" href="{{ url_for('tools_categories') }}">
+                            <i class="fas fa-microphone me-1"></i>Voice Booking
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if session.get('user_id') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="footer-title">About FarmTools</h5>
+                    <p class="text-muted">Your trusted platform for renting agricultural tools and equipment. Connect with local farmers and make farming more efficient.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-title">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('index') }}" class="footer-link">Home</a></li>
+                        <li><a href="#" class="footer-link">About Us</a></li>
+                        <li><a href="#" class="footer-link">Contact</a></li>
+                        <li><a href="#" class="footer-link">Terms & Conditions</a></li>
+                        <li><a href="#" class="footer-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="footer-title">Connect With Us</h5>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center text-muted">
+                <p class="mb-0">&copy; 2024 FarmTools. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+    <script>
+        // Function to handle translation widget visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for Google Translate to load
+            setTimeout(function() {
+                // Add language names to the dropdown
+                const languageNames = {
+                    'en': 'English',
+                    'hi': 'हिंदी (Hindi)',
+                    'bn': 'বাংলা (Bengali)',
+                    'te': 'తెలుగు (Telugu)',
+                    'ta': 'தமிழ் (Tamil)',
+                    'ml': 'മലയാളം (Malayalam)',
+                    'kn': 'ಕನ್ನಡ (Kannada)',
+                    'gu': 'ગુજરાતી (Gujarati)',
+                    'mr': 'मराठी (Marathi)',
+                    'pa': 'ਪੰਜਾਬੀ (Punjabi)'
+                };
+
+                const select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    // Store the current selection
+                    const currentSelection = select.value;
+
+                    // Clear existing options
+                    select.innerHTML = '';
+
+                    // Add custom options
+                    Object.entries(languageNames).forEach(([code, name]) => {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.text = name;
+                        select.appendChild(option);
+                    });
+
+                    // Restore selection
+                    select.value = currentSelection;
+                }
+            }, 1000);
+        });
+
+        // Fix for translation issues
+        function fixTranslationIssues() {
+            // Remove Google Translate's changes to the body tag
+            document.body.style.top = '0';
+            document.body.style.position = 'static';
+
+            // Scroll to the correct position
+            window.scrollTo(0, window.scrollY);
+        }
+
+        // Listen for translation changes
+        window.addEventListener('load', function() {
+            if (document.querySelector('.goog-te-combo')) {
+                document.querySelector('.goog-te-combo').addEventListener('change', function() {
+                    setTimeout(fixTranslationIssues, 1000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

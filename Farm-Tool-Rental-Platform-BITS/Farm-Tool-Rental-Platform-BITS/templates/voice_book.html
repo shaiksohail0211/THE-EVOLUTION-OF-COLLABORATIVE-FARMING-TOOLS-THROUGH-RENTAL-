@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}Voice Booking{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Available Tools - Voice Booking {% if selected_category %}<small class="text-muted">- {{ selected_category }}</small>{% endif %}</h2>
+
+    <!-- Back to Categories Button -->
+    <div class="mb-4">
+        <a href="{{ url_for('tools_categories') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Categories
+        </a>
+    </div>
+
+    <!-- Status Message -->
+    <div id="statusMessage" class="alert alert-info d-none" role="alert"></div>
+
+    <div class="row g-4">
+        {% for tool in tools %}
+        <div class="col-md-4">
+            <div class="card h-100" data-tool-id="{{ tool.id }}">
+                {% if tool.image_url_1 %}
+                <img src="{{ url_for('static', filename=tool.image_url_1.replace('\\', '/')) }}" class="card-img-top" alt="{{ tool.name }}">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/tool-placeholder.jpg') }}" class="card-img-top" alt="Tool placeholder">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="badge bg-secondary me-2">{{ loop.index }}</span>
+                        {{ tool.name }}
+                    </h5>
+                    <p class="card-text text-muted">{{ tool.brand }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-primary">₹{{ "%.2f"|format(tool.price_per_day) }}/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+            <h3>No rental tools available</h3>
+            <p class="text-muted">No tools are currently available for rent.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Voice Control Button -->
+    <div class="position-fixed bottom-0 end-0 p-3">
+        <button class="btn btn-primary btn-lg rounded-circle shadow" id="voiceButton" type="button">
+            <i class="fas fa-microphone"></i>
+        </button>
+    </div>
+
+    <!-- Voice Control Modal -->
+    <div class="modal fade" id="voiceControlModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="voiceControlModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="voiceControlModalLabel">Voice Control</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-microphone fa-5x" id="micIcon"></i>
+                    </div>
+                    <div id="modalStatusMessage" class="alert alert-info mb-4">
+                        Click Start to begin recording
+                    </div>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button class="btn btn-success" id="startRecordingBtn">
+                            <i class="fas fa-play me-2"></i>Start
+                        </button>
+                        <button class="btn btn-danger" id="stopRecordingBtn" disabled>
+                            <i class="fas fa-stop me-2"></i>Stop
+                        </button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+#micIcon {
+    color: #6c757d;
+    transition: color 0.3s ease;
+}
+
+#micIcon.recording {
+    color: #dc3545;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap Modal
+    const voiceControlModal = new bootstrap.Modal(document.getElementById('voiceControlModal'), {
+        keyboard: false
+    });
+
+    const voiceButton = document.getElementById('voiceButton');
+
+    // Add click handler for the microphone button
+    voiceButton.addEventListener('click', () => {
+        voiceControlModal.show();
+    });
+
+    const micIcon = document.getElementById('micIcon');
+    const startRecordingBtn = document.getElementById('startRecordingBtn');
+    const stopRecordingBtn = document.getElementById('stopRecordingBtn');
+    const modalStatusMessage = document.getElementById('modalStatusMessage');
+    let isRecording = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    const VOICE_SERVER_URL = 'http://127.0.0.1:5500';
+
+    // Add speech synthesis
+    const speechSynthesis = window.speechSynthesis;
+    let speaking = false;
+
+    function speak(text) {
+        if (speaking) {
+            speechSynthesis.cancel();
+        }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        speaking = true;
+
+        utterance.onend = () => {
+            speaking = false;
+        };
+
+        speechSynthesis.speak(utterance);
+    }
+
+    function updateStatus(message, isError = false) {
+        modalStatusMessage.textContent = message;
+        modalStatusMessage.className = `alert ${isError ? 'alert-danger' : 'alert-info'} mb-4`;
+    }
+
+    function cleanup() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+        }
+        if (mediaRecorder && mediaRecorder.stream) {
+            mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
+        audioChunks = [];
+        isRecording = false;
+        startRecordingBtn.disabled = false;
+        stopRecordingBtn.disabled = true;
+        micIcon.classList.remove('recording');
+    }
+
+    // Function to read out available tools
+    function readAvailableTools() {
+        const toolCards = document.querySelectorAll('.card');
+        if (toolCards.length > 0) {
+            speak("Welcome to voice booking. Here are the available tools:");
+
+            const toolDescriptions = Array.from(toolCards).map(card => {
+                const name = card.querySelector('.card-title').textContent.trim();
+                const brand = card.querySelector('.card-text').textContent.trim();
+                const priceElement = card.querySelector('.text-primary, .text-success');
+                const price = priceElement ? priceElement.textContent.trim() : '';
+
+                return `${name}, by ${brand}, priced at ${price}`;
+            }).join('. ');
+
+            speak(toolDescriptions);
+        } else {
+            speak("Welcome to voice booking. No tools are currently available.");
+        }
+    }
+
+    // Call readAvailableTools after a short delay to ensure speech synthesis is ready
+    setTimeout(readAvailableTools, 1000);
+
+    // Start recording button handler
+    startRecordingBtn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    channelCount: 1,
+                    sampleRate: 44100
+                }
+            });
+
+            mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'audio/webm',
+                audioBitsPerSecond: 128000
+            });
+
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+                audioChunks.push(event.data);
+            };
+
+            // Call the start_recording endpoint
+            const response = await fetch(`${VOICE_SERVER_URL}/start_recording`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to start recording on server');
+            }
+
+            mediaRecorder.start();
+            isRecording = true;
+            startRecordingBtn.disabled = true;
+            stopRecordingBtn.disabled = false;
+            micIcon.classList.add('recording');
+            updateStatus('Recording... Speak now');
+
+        } catch (error) {
+            console.error('Error starting recording:', error);
+            updateStatus('Error starting recording. Please try again.', true);
+        }
+    });
+
+    // Stop recording button handler
+    stopRecordingBtn.addEventListener('click', () => {
+        if (!mediaRecorder) return;
+
+        mediaRecorder.stop();
+        updateStatus('Processing audio...');
+
+        mediaRecorder.onstop = async () => {
+            try {
+                // Create WAV from audio chunks
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                // Convert to WAV format
+                const wavBuffer = audioBufferToWav(audioBuffer);
+                const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+
+                // Send to server
+                const formData = new FormData();
+                formData.append('audio_data', wavBlob, 'recording.wav');
+
+                const response = await fetch(`${VOICE_SERVER_URL}/stop_recording`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.status === "Error") {
+                    updateStatus(data.error, true);
+                } else {
+                    const recognizedText = data.text.toLowerCase();
+                    updateStatus(`Recognized text: ${recognizedText}`);
+
+                    // Handle booking commands
+                    if (recognizedText.match(/book(\s+tool)?\s+(\d+)/)) {
+                        const toolIndex = recognizedText.match(/book(\s+tool)?\s+(\d+)/)[2];
+                        const toolCards = document.querySelectorAll('.card');
+
+                        // Convert from 1-based to 0-based index
+                        const index = parseInt(toolIndex) - 1;
+
+                        if (index >= 0 && index < toolCards.length) {
+                            const toolCard = toolCards[index];
+                            const toolId = toolCard.dataset.toolId;
+
+                            // Get today's date
+                            const today = new Date();
+                            const tomorrow = new Date(today);
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+
+                            // Format dates as YYYY-MM-DD
+                            const startDate = today.toISOString().split('T')[0];
+                            const endDate = tomorrow.toISOString().split('T')[0];
+
+                            // Create and submit the rental request form
+                            const formData = new FormData();
+                            formData.append('start_date', startDate);
+                            formData.append('end_date', endDate);
+                            formData.append('message', 'Rental request via voice command');
+
+                            try {
+                                const response = await fetch(`/tools/${toolId}/request-rental`, {
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (response.ok) {
+                                    updateStatus('Rental request submitted successfully!');
+                                    // Redirect to my rental requests page after 2 seconds
+                                    setTimeout(() => {
+                                        window.location.href = '/my-rental-requests';
+                                    }, 2000);
+                                } else {
+                                    const errorData = await response.text();
+                                    updateStatus(`Failed to submit rental request: ${errorData}`, true);
+                                }
+                            } catch (error) {
+                                updateStatus(`Error submitting rental request: ${error.message}`, true);
+                            }
+                        } else {
+                            updateStatus(`Invalid tool number. Please choose a number between 1 and ${toolCards.length}`, true);
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error processing recording:', error);
+                updateStatus('Error processing recording. Please try again.', true);
+            } finally {
+                cleanup();
+            }
+        };
+    });
+
+    // Audio buffer to WAV conversion function
+    function audioBufferToWav(buffer) {
+        const numChannels = 1;  // Mono audio
+        const sampleRate = buffer.sampleRate;
+        const format = 1;  // PCM
+        const bitDepth = 16;
+
+        const bytesPerSample = bitDepth / 8;
+        const blockAlign = numChannels * bytesPerSample;
+
+        const wav = new ArrayBuffer(44 + buffer.length * bytesPerSample);
+        const view = new DataView(wav);
+
+        // Write WAV header
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + buffer.length * bytesPerSample, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint16(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, bitDepth, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, buffer.length * bytesPerSample, true);
+
+        // Write audio data
+        const offset = 44;
+        const bufferData = buffer.getChannelData(0);
+        for (let i = 0; i < bufferData.length; i++) {
+            const sample = Math.max(-1, Math.min(1, bufferData[i]));
+            view.setInt16(offset + i * bytesPerSample, sample * 0x7FFF, true);
+        }
+
+        return wav;
+    }
+
+    function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    }
+
+    // Process voice commands
+    function processVoiceCommand(text) {
+        const toolCards = document.querySelectorAll('.card');
+
+        if (text.includes('show tools') || text.includes('list tools') || text.includes('available tools')) {
+            if (toolCards.length > 0) {
+                const toolDescriptions = Array.from(toolCards).map(card => {
+                    const name = card.querySelector('.card-title').textContent.trim();
+                    const brand = card.querySelector('.card-text').textContent.trim();
+                    const priceElement = card.querySelector('.text-primary, .text-success');
+                    const price = priceElement ? priceElement.textContent.trim() : '';
+
+                    return `${name} by ${brand}, priced at ${price}`;
+                }).join('. ');
+
+                speak(`Here are the available tools: ${toolDescriptions}`);
+            } else {
+                speak("No tools are currently available.");
+            }
+        } else if (text.includes('search') || text.includes('find')) {
+            // Extract search term
+            const searchTerms = text.split(/search for|find|search/i)[1].trim();
+            const matchingTools = Array.from(toolCards).filter(card =>
+                card.textContent.toLowerCase().includes(searchTerms.toLowerCase())
+            );
+
+            if (matchingTools.length > 0) {
+                const results = matchingTools.map(card => {
+                    const name = card.querySelector('.card-title').textContent.trim();
+                    const price = card.querySelector('.text-primary, .text-success').textContent.trim();
+                    return `${name} at ${price}`;
+                }).join(', ');
+                speak(`Found ${matchingTools.length} matching tools: ${results}`);
+            } else {
+                speak(`No tools found matching "${searchTerms}"`);
+            }
+        } else {
+            speak("You can say 'show tools' to list all tools, or 'search for' followed by what you're looking for.");
+        }
+    }
+
+    // Handle modal close - stop speaking if modal is closed
+    document.getElementById('voiceControlModal').addEventListener('hidden.bs.modal', () => {
+        if (speaking) {
+            speechSynthesis.cancel();
+        }
+        cleanup();
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

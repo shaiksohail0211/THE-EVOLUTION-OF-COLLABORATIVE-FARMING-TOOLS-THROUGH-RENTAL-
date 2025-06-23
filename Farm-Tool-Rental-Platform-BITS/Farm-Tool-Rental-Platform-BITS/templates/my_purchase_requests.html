@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}My Purchase Requests{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Selling Requests -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Purchase Requests for My Tools</h5>
+                </div>
+                <div class="card-body">
+                    {% if selling_requests %}
+                        {% for request in selling_requests %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ request.tool_details.name }}</h6>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-2"></i>Buyer: {{ request.buyer_user.username }}
+                                        </small>
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-phone me-2"></i>Contact: {{ request.buyer_user.mobile if request.buyer_user.mobile else 'Not provided' }}
+                                        </small>
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-2"></i>Requested: {{ request.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </p>
+                                    {% if request.message %}
+                                        <p class="card-text">
+                                            <i class="fas fa-comment me-2"></i>Message:<br>
+                                            {{ request.message }}
+                                        </p>
+                                    {% endif %}
+                                    {% if request.status == 'pending' %}
+                                        <div class="btn-group w-100">
+                                            <form action="{{ url_for('handle_purchase_request', request_id=request.id) }}" method="POST" class="d-inline me-2">
+                                                <input type="hidden" name="action" value="accept">
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-check me-2"></i>Accept
+                                                </button>
+                                            </form>
+                                            <form action="{{ url_for('handle_purchase_request', request_id=request.id) }}" method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="reject">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-times me-2"></i>Reject
+                                                </button>
+                                            </form>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-{{ 'success' if request.status == 'accepted' else 'danger' }}">
+                                            {{ request.status.title() }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">No pending purchase requests for your tools.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Buying Requests -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">My Purchase Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if buying_requests %}
+                        {% for request in buying_requests %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ request.tool_details.name }}</h6>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-2"></i>Seller: {{ request.seller_user.username }}
+                                        </small>
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag me-2"></i>Price: Rs{{ "%.2f"|format(request.price) }}
+                                        </small>
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-2"></i>Requested: {{ request.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </p>
+                                    {% if request.message %}
+                                        <p class="card-text">
+                                            <i class="fas fa-comment me-2"></i>Your Message:<br>
+                                            {{ request.message }}
+                                        </p>
+                                    {% endif %}
+                                    <span class="badge bg-{{ 'warning' if request.status == 'pending' else 'success' if request.status == 'accepted' else 'danger' }}">
+                                        {{ request.status.title() }}
+                                    </span>
+                                    {% if request.status == 'accepted' %}
+                                        <p class="card-text mt-2">
+                                            <i class="fas fa-phone me-2"></i>Seller Contact: {{ request.seller_user.mobile if request.seller_user.mobile else 'Not provided' }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">You haven't made any purchase requests yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

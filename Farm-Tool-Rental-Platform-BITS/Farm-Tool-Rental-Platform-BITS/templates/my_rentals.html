@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}My Rentals{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">My Rentals</h2>
+
+    <!-- My Active Rentals -->
+    <div class="card mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Active Rentals</h5>
+        </div>
+        <div class="card-body">
+        {% if my_rentals %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Owner</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% for rental in my_rentals %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_tool', tool_id=rental.tool.id) }}" class="text-decoration-none">
+                                    {{ rental.tool.name }}
+                                </a>
+                            </td>
+                            <td>{{ rental.owner.username }}</td>
+                            <td>{{ rental.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ rental.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>Rs{{ "%.2f"|format(rental.total_price) }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ rental.status }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('view_tool', tool_id=rental.tool.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if rental.status == 'active' %}
+                                    <button class="btn btn-sm btn-outline-success" 
+                                            onclick="updateRentalStatus('{{ rental.id }}', 'completed')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                <h4>No active rentals</h4>
+                <p class="text-muted">Browse available tools to start renting!</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Browse Tools
+                        </a>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+
+    <!-- Rentals of My Tools -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Rentals of My Tools</h5>
+        </div>
+                            <div class="card-body">
+            {% if rentals_of_my_tools %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Renter</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rental in rentals_of_my_tools %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('view_tool', tool_id=rental.tool.id) }}" class="text-decoration-none">
+                                    {{ rental.tool.name }}
+                                </a>
+                            </td>
+                            <td>{{ rental.renter.username }}</td>
+                            <td>{{ rental.start_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ rental.end_date.strftime('%Y-%m-%d') }}</td>
+                            <td>Rs{{ "%.2f"|format(rental.total_price) }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ rental.status }}</span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('view_tool', tool_id=rental.tool.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if rental.status == 'active' %}
+                                        {% if rental.tool.owner_id == session['user_id'] %}
+                                        <button class="btn btn-sm btn-outline-success"
+                                                onclick="updateRentalStatus('{{ rental.id }}', 'completed')"
+                                                title="Mark as completed">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+                <h4>No rentals of your tools</h4>
+                <p class="text-muted">Your tools haven't been rented yet</p>
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateRentalStatus(rentalId, status) {
+    if (confirm(`Are you sure you want to mark this rental as ${status}?`)) {
+        fetch(`/rentals/${rentalId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.message) {
+                window.location.reload();
+            } else {
+                alert(data.error || 'Error updating rental status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating rental status: ' + error.message);
+        });
+    }
+}
+</script>
+{% endblock %}

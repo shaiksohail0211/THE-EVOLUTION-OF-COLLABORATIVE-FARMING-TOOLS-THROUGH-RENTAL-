@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Request Rental - {{ tool.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Request Rental for {{ tool.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Tool Details</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Category:</strong> {{ tool.category }}</p>
+                                <p class="mb-1"><strong>Brand:</strong> {{ tool.brand }}</p>
+                                <p class="mb-1"><strong>Power Source:</strong> {{ tool.power_source }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Condition:</strong> {{ tool.condition }}</p>
+                                <p class="mb-1"><strong>Maintenance Status:</strong> {{ tool.maintenance_status }}</p>
+                                <p class="mb-1"><strong>Price per Day:</strong> Rs{{ "%.2f"|format(tool.price_per_day) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <form method="POST" id="rentalForm">
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" 
+                                   min="{{ today }}" required>
+                            <div class="form-text">Select when you want to start using the tool</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" 
+                                   min="{{ today }}" required>
+                            <div class="form-text">Select when you will return the tool</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message to Owner</label>
+                            <textarea class="form-control" id="message" name="message" rows="4"></textarea>
+                            <div class="form-text">Include any specific requirements or questions about the tool</div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">Important Information</h5>
+                            <ul class="mb-0">
+                                <li>Please ensure you have the necessary experience to operate this agricultural tool</li>
+                                <li>You will be responsible for any damage during the rental period</li>
+                                <li>Make sure you have appropriate insurance coverage</li>
+                                <li>Follow all safety guidelines and manufacturer instructions</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Request
+                            </button>
+                            <a href="{{ url_for('view_tool', tool_id=tool.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startDate = document.getElementById('start_date');
+    const endDate = document.getElementById('end_date');
+    const form = document.getElementById('rentalForm');
+
+    // Set minimum end date based on start date
+    startDate.addEventListener('change', function() {
+        endDate.min = this.value;
+        if (endDate.value && endDate.value < this.value) {
+            endDate.value = this.value;
+        }
+    });
+
+    // Validate dates
+    function validateDates() {
+        if (startDate.value && endDate.value) {
+            const start = new Date(startDate.value);
+            const end = new Date(endDate.value);
+            if (end < start) {
+                alert('End date must be after start date');
+                endDate.value = startDate.value;
+            }
+        }
+    }
+
+    endDate.addEventListener('change', validateDates);
+
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        validateDates();
+        if (startDate.value && endDate.value) {
+            const start = new Date(startDate.value);
+            const end = new Date(endDate.value);
+            if (end < start) {
+                e.preventDefault();
+                alert('Please select valid dates');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
